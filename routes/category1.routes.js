@@ -19,12 +19,43 @@ const {
  * @swagger
  * /category:
  *   get:
- *     summary: Get all categories
+ *     summary: Get all categories with pagination, filtering, and sorting
  *     tags: [Categories]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Page number (default is 1)
+ *       - in: query
+ *         name: take
+ *         schema:
+ *           type: integer
+ *         description: Number of categories per page (default is 10)
+ *       - in: query
+ *         name: filter
+ *         schema:
+ *           type: string
+ *         description: Filter categories by name
+ *       - in: query
+ *         name: column
+ *         schema:
+ *           type: string
+ *           enum: [id, name]
+ *         description: Column to sort by (default is id)
+ *       - in: query
+ *         name: order
+ *         schema:
+ *           type: string
+ *           enum: [ASC, DESC]
+ *         description: Sorting order (default is ASC)
  *     responses:
  *       200:
- *         description: Successfully retrieved all categories
+ *         description: Successfully retrieved categories
+ *       500:
+ *         description: Internal server error
  */
+
 
 route.get("/", getAllCategories);
 

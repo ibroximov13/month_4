@@ -3,7 +3,26 @@ const category1Validation = require("../validations/category1.validate");
 
 const getAllCategories = async (req, res) => {
     try {
-        let {rows} = await pool.query(`select * from category1`);
+        let page = req.query.page || 1;
+        let take = req.query.take || 10;
+        let offset = (page - 1) * take;
+
+        let filter = req.query.filter || "";
+        let order = req.query.order === "DESC" ? "DESC" : "ASC";
+        let allowedColumns = ["id", "name"];
+        let column = allowedColumns.includes(req.query.column) ? req.query.column : "id";
+
+        const query = `
+        SELECT 
+        category1.* 
+        FROM category1
+        WHERE ${filter ? "category1.name ILIKE $3" : "TRUE"}
+        ORDER BY category1.${column} ${order}
+        LIMIT $1 OFFSET $2
+        `;
+        const values = filter ? [take, offset, `%${filter}%`] : [take, offset];
+        const { rows } = await pool.query(query, values);
+
         res.send(rows);
     } catch (error) {
         console.log(error);

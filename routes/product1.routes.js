@@ -19,12 +19,43 @@ const {
  * @swagger
  * /product:
  *   get:
- *     summary: Get all products
+ *     summary: Get all products with pagination, filtering, and sorting
  *     tags: [Products]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Page number (default is 1)
+ *       - in: query
+ *         name: take
+ *         schema:
+ *           type: integer
+ *         description: Number of products per page (default is 10)
+ *       - in: query
+ *         name: filter
+ *         schema:
+ *           type: string
+ *         description: Filter products by name
+ *       - in: query
+ *         name: column
+ *         schema:
+ *           type: string
+ *           enum: [id, name, price, color]
+ *         description: Column to sort by (default is id)
+ *       - in: query
+ *         name: order
+ *         schema:
+ *           type: string
+ *           enum: [ASC, DESC]
+ *         description: Sorting order (default is ASC)
  *     responses:
  *       200:
- *         description: Successfully retrieved all products
+ *         description: Successfully retrieved products
+ *       500:
+ *         description: Internal server error
  */
+
 route.get("/", getAllProducts);
 
 /**

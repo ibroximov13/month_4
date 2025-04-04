@@ -7,8 +7,24 @@ const getAllProducts = async (req, res) => {
         let take = req.query.take || 10;
         let offset = ( page -1 ) * take;
 
-        let {rows} = await pool.query(`select product1.*, json_build_object('id', category1.id, 'name', category1.name) as category from product1
-        left join category1 on category1.id = product1.category1_id`);
+        let filter = req.query.filter || "";
+        let order = req.query.order === "DESC" ? "DESC" : "ASC";
+        let allowedColumns = ["id", "name", "price", "color"];
+        let column = allowedColumns.includes(req.query.column) ? req.query.column : "id";
+
+        const query = `
+        SELECT 
+        product1.*, 
+        json_build_object('id', category1.id, 'name', category1.name) as category 
+        FROM product1
+        LEFT JOIN category1 ON category1.id = product1.category1_id
+        WHERE ${filter ? "product1.name ILIKE $3" : "TRUE"}
+        ORDER BY product1.${column} ${order}
+        LIMIT $1 OFFSET $2
+        `;
+        const values = filter ? [take, offset, `%${filter}%`] : [take, offset];
+        const { rows } = await pool.query(query, values);
+
         res.send(rows);
     } catch (error) {
         console.log(error);
